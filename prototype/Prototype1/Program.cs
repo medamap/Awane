@@ -14,11 +14,8 @@ var builder = new ContainerBuilder();
 // インターセプターを登録
 builder.RegisterType<LoggingInterceptor>().AsSelf();
 
-// Paiを登録（シングルトン）
-builder.RegisterType<Pai>()
-    .As<IPai>()
-    .AsSelf()
-    .SingleInstance();
+// Paiの登録を削除（ProtoPaiに移動）
+// IPaiはProtoPaiプロジェクトから提供される
 
 // CalcMulも登録（前回の例）
 builder.RegisterType<CalcMul>()
@@ -33,8 +30,7 @@ var container = builder.Build();
 var awane = AwaneSystem.Instance;
 
 // コンテナからインスタンスを解決してAwaneに登録
-var paiInstance = container.Resolve<Pai>(); // 具象クラスで解決
-awane.Register(paiInstance);
+// Paiは削除されたので、ICalcのみ登録
 awane.Register(container.Resolve<ICalc>());
 
 // 初期化実行
@@ -44,21 +40,12 @@ Console.WriteLine();
 
 // 同一プロセス内でGetComponent
 Console.WriteLine("=== GetComponent テスト ===");
+// IPaiは別プロセス（ProtoPai）から提供されるため、ローカルでは見つからない
 var pai = Awane.GetComponent<IPai>();
 Console.WriteLine($"GetComponent<IPai>: {(pai != null ? pai.GetType().Name : "null")}");
-
-if (pai != null)
+if (pai == null)
 {
-    var result = await pai.PaiMethodAsync(new PaiParameter 
-    { 
-        TaskName = "テストタスク", 
-        Priority = 1 
-    });
-    Console.WriteLine($"結果: {result.Message}");
-}
-else
-{
-    Console.WriteLine("IPai が見つかりませんでした");
+    Console.WriteLine("IPaiはProtoPaiプロセスから提供されます");
 }
 
 var calc = Awane.GetComponent<ICalc>();
@@ -92,8 +79,8 @@ await awane.StopMainLoopAsync();
 awane.StartRemoteServer();
 
 Console.WriteLine();
-Console.WriteLine("IPaiを提供しています。");
-Console.WriteLine("Prototype2からアクセスできます。");
+Console.WriteLine("ICalcを提供しています。");
+Console.WriteLine("他のプロセスからアクセスできます。");
 Console.WriteLine("Enterキーで終了...");
 Console.ReadLine();
 

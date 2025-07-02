@@ -8,8 +8,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AwaneCore\AwaneCore.csproj" />
     <ProjectReference Include="..\SharedInterfaces\SharedInterfaces.csproj" />
-    <ProjectReference Include="..\ProtoPai\ProtoPai.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Autofac" Version="8.3.0" />
   </ItemGroup>
 
 </Project>

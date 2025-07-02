@@ -2,64 +2,44 @@ using System.Diagnostics;
 using AwaneCore;
 using SharedInterfaces;
 
-namespace Prototype1;
+namespace ProtoPai;
 
-// Paiの実装（ライフサイクル付き）
-public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
+// Claude Code実装のPaiちゃん
+public class ClaudeCodePai : IPai, IAsyncStartable
 {
-    private int _tickCount = 0;
-    private int _fixedTickCount = 0;
+    private readonly string _agentName = "ClaudeCodePai";
     
-    // 初期化処理
+    // 初期化処理（必要に応じて）
     public async Task StartAsync(CancellationToken cancellationToken)
     {
-        Console.WriteLine("[Pai] 初期化開始...");
-        await Task.Delay(500, cancellationToken); // 初期化処理のシミュレート
-        Console.WriteLine("[Pai] 初期化完了！");
+        Console.WriteLine($"[{_agentName}] 初期化開始...");
+        // 必要な初期化処理があればここに記述
+        await Task.Delay(100, cancellationToken);
+        Console.WriteLine($"[{_agentName}] 初期化完了！");
     }
     
-    // 毎フレーム呼ばれる
-    public void Tick()
+    // AIエージェント実行
+    public async Task<PaiResult> ExecuteAIAgent(string prompt)
     {
-        _tickCount++;
-        if (_tickCount % 60 == 0) // 1秒ごとに出力
-        {
-            Console.WriteLine($"[Pai] Tick: {_tickCount}");
-        }
-    }
-    
-    // 固定間隔で呼ばれる
-    public void FixedTick()
-    {
-        _fixedTickCount++;
-        if (_fixedTickCount % 60 == 0) // 1秒ごとに出力
-        {
-            Console.WriteLine($"[Pai] FixedTick: {_fixedTickCount}");
-        }
-    }
-    
-    // ビジネスロジック - Claude CLIを呼び出す
-    public async Task<PaiResult> PaiMethodAsync(PaiParameter parameter)
-    {
-        Console.WriteLine($"[Pai] タスク処理開始: {parameter.TaskName} (優先度: {parameter.Priority})");
+        Console.WriteLine($"[{_agentName}] プロンプト受信: {prompt.Substring(0, Math.Min(50, prompt.Length))}...");
         
         try
         {
             // プロンプトを作成（シングルクォートのエスケープ処理）
-            var prompt = parameter.TaskName.Replace("'", "'\"'\"'");
+            var escapedPrompt = prompt.Replace("'", "'\"'\"'");
             
             // Claude CLIコマンドを実行
             var processInfo = new ProcessStartInfo
             {
                 FileName = "claude",
-                Arguments = $"--dangerously-skip-permissions --print '{prompt}'",
+                Arguments = $"--dangerously-skip-permissions --print '{escapedPrompt}'",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true
             };
             
-            Console.WriteLine($"[Pai] Claude CLIを実行: {processInfo.Arguments}");
+            Console.WriteLine($"[{_agentName}] Claude CLIを実行中...");
             
             using var process = Process.Start(processInfo);
             if (process == null)
@@ -100,7 +80,7 @@ public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
             
             if (process.ExitCode != 0)
             {
-                Console.WriteLine($"[Pai] エラー発生: {error}");
+                Console.WriteLine($"[{_agentName}] エラー発生: {error}");
                 return new PaiResult
                 {
                     Success = false,
@@ -108,7 +88,7 @@ public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
                 };
             }
             
-            Console.WriteLine($"[Pai] Claude応答取得成功");
+            Console.WriteLine($"[{_agentName}] 応答取得成功");
             return new PaiResult
             {
                 Success = true,
@@ -117,7 +97,7 @@ public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Pai] 例外発生: {ex.Message}");
+            Console.WriteLine($"[{_agentName}] 例外発生: {ex.Message}");
             return new PaiResult
             {
                 Success = false,

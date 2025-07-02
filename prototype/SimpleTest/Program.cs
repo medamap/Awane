@@ -1,11 +1,11 @@
-using Prototype1;
 using SharedInterfaces;
+using ProtoPai;
 
 Console.WriteLine("=== AI計算ノード 直接テスト ===");
 Console.WriteLine();
 
-// 直接Paiインスタンスを作成
-var pai = new Pai();
+// 直接ClaudeCodePaiインスタンスを作成
+var pai = new ClaudeCodePai();
 
 // 初期化
 await pai.StartAsync(CancellationToken.None);
@@ -15,11 +15,7 @@ Console.WriteLine("質問: たまご＋こむぎこ＋さとう＋チョコレ�
 Console.WriteLine();
 
 // Claude CLIを呼び出す
-var result = await pai.PaiMethodAsync(new PaiParameter
-{
-    TaskName = "たまご＋こむぎこ＋さとう＋チョコレート＝？",
-    Priority = 1
-});
+var result = await pai.ExecuteAIAgent("たまご＋こむぎこ＋さとう＋チョコレート＝？");
 
 Console.WriteLine();
 if (result.Success)

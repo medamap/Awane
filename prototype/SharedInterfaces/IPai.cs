@@ -1,9 +1,9 @@
 namespace SharedInterfaces;
 
-// Paiのインターフェース
+// Paiのインターフェース - AIエージェント実行
 public interface IPai
 {
-    Task<PaiResult> PaiMethodAsync(PaiParameter parameter);
+    Task<PaiResult> ExecuteAIAgent(string prompt);
 }
 
 // パラメータと結果の型

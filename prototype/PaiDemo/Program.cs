@@ -37,11 +37,7 @@ while (true)
     Console.WriteLine();
     Console.WriteLine("Claude CLIに問い合わせ中...");
     
-    var result = await pai.PaiMethodAsync(new PaiParameter
-    {
-        TaskName = input,
-        Priority = 1
-    });
+    var result = await pai.ExecuteAIAgent(input);
     
     Console.WriteLine();
     if (result.Success)
