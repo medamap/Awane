@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using AwaneCore;
 using SharedInterfaces;
 
@@ -37,18 +38,70 @@ public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
         }
     }
     
-    // ビジネスロジック
+    // ビジネスロジック - Claude CLIを呼び出す
     public async Task<PaiResult> PaiMethodAsync(PaiParameter parameter)
     {
         Console.WriteLine($"[Pai] タスク処理開始: {parameter.TaskName} (優先度: {parameter.Priority})");
         
-        // 処理のシミュレート
-        await Task.Delay(100);
-        
-        return new PaiResult
+        try
         {
-            Success = true,
-            Message = $"タスク '{parameter.TaskName}' を処理しました"
-        };
+            // プロンプトを作成（シングルクォートのエスケープ処理）
+            var prompt = parameter.TaskName.Replace("'", "'\"'\"'");
+            
+            // Claude CLIコマンドを実行
+            var processInfo = new ProcessStartInfo
+            {
+                FileName = "claude",
+                Arguments = $"--dangerously-skip-permissions --print '{prompt}'",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            };
+            
+            Console.WriteLine($"[Pai] Claude CLIを実行: {processInfo.Arguments}");
+            
+            using var process = Process.Start(processInfo);
+            if (process == null)
+            {
+                throw new InvalidOperationException("プロセスの起動に失敗しました");
+            }
+            
+            // 標準出力を非同期で読み取る
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
+            
+            // プロセスの終了を待つ
+            await process.WaitForExitAsync();
+            
+            var output = await outputTask;
+            var error = await errorTask;
+            
+            if (process.ExitCode != 0)
+            {
+                Console.WriteLine($"[Pai] エラー発生: {error}");
+                return new PaiResult
+                {
+                    Success = false,
+                    Message = $"Claude CLIエラー: {error}"
+                };
+            }
+            
+            Console.WriteLine($"[Pai] Claude応答取得成功");
+            return new PaiResult
+            {
+                Success = true,
+                Message = output.Trim()
+            };
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Pai] 例外発生: {ex.Message}");
+            return new PaiResult
+            {
+                Success = false,
+                Message = $"エラー: {ex.Message}"
+            };
+        }
     }
 }

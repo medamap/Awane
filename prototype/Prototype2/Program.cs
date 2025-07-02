@@ -22,7 +22,7 @@ if (remotePai != null)
     // リモートメソッドを呼び出す
     var result = await remotePai.PaiMethodAsync(new PaiParameter 
     { 
-        TaskName = "Prototype2からのタスク", 
+        TaskName = "こんにちは！今日の天気はどうですか？短く答えて。", 
         Priority = 5 
     });
     
