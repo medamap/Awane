@@ -1,4 +1,4 @@
-namespace Prototype1;
+namespace SharedInterfaces;
 
 public interface ICalc
 {

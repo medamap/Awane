@@ -1,3 +1,5 @@
+using SharedInterfaces;
+
 namespace Prototype1;
 
 public class CalcMul : ICalc

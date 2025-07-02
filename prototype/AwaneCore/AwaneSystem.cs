@@ -1,25 +1,9 @@
 using System.Collections.Concurrent;
 
-namespace Prototype1;
-
-// ライフサイクルインターフェース
-public interface IAsyncStartable
-{
-    Task StartAsync(CancellationToken cancellationToken);
-}
-
-public interface ITickable
-{
-    void Tick();
-}
-
-public interface IFixedTickable
-{
-    void FixedTick();
-}
+namespace AwaneCore;
 
 // Awaneシステム本体
-public class AwaneSystem
+public partial class AwaneSystem
 {
     private readonly ConcurrentDictionary<Type, object> _components = new();
     private readonly List<ITickable> _tickables = new();
@@ -171,7 +155,7 @@ public class AwaneSystem
 }
 
 // Unity統合用の静的クラス
-public static class Awane
+public static partial class Awane
 {
     // Unity MonoBehaviourから呼び出し用
     public static void ExecuteTick()

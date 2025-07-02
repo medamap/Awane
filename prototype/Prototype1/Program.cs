@@ -1,9 +1,11 @@
 ﻿using Autofac;
 using Autofac.Extras.DynamicProxy;
 using Castle.DynamicProxy;
+using AwaneCore;
+using SharedInterfaces;
 using Prototype1;
 
-Console.WriteLine("=== Awane System プロトタイプ ===");
+Console.WriteLine("=== Prototype1 - IPai Provider ===");
 Console.WriteLine();
 
 // Autofac コンテナの構築
@@ -85,6 +87,18 @@ await Task.Delay(3000);
 // 停止
 cts.Cancel();
 await awane.StopMainLoopAsync();
+
+// リモートサーバーを開始
+awane.StartRemoteServer();
+
+Console.WriteLine();
+Console.WriteLine("IPaiを提供しています。");
+Console.WriteLine("Prototype2からアクセスできます。");
+Console.WriteLine("Enterキーで終了...");
+Console.ReadLine();
+
+awane.Dispose();
+AwaneProcessDiscovery.StopRegistryServer();
 
 Console.WriteLine();
 Console.WriteLine("=== プログラム終了 ===");
