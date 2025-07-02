@@ -9,19 +9,6 @@ public partial class AwaneSystem : IDisposable
     private bool _disposed = false;
     private bool _isActive = true; // 外部からのアクセスを受け付けるか
     
-    // コンポーネント登録（Dispose対応版）
-    public void RegisterWithDispose<T>(T component) where T : class
-    {
-        // 通常の登録処理
-        Register(component);
-        
-        // IDisposableの場合は別途管理
-        if (component is IDisposable disposable)
-        {
-            _disposables.Add(disposable);
-            Console.WriteLine($"[AwaneSystem] Disposable登録: {component.GetType().Name}");
-        }
-    }
     
     // システムのアクティブ状態
     public bool IsActive => _isActive && !_disposed;

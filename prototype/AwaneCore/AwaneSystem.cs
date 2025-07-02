@@ -47,6 +47,13 @@ public partial class AwaneSystem
             
         if (component is IFixedTickable fixedTickable)
             _fixedTickables.Add(fixedTickable);
+            
+        // IDisposableの場合は管理リストに追加
+        if (component is IDisposable disposable)
+        {
+            _disposables.Add(disposable);
+            Console.WriteLine($"[AwaneSystem] Disposable登録: {componentType.Name}");
+        }
     }
     
     // コンポーネント取得（ローカルプロセスから）
@@ -147,11 +154,6 @@ public partial class AwaneSystem
         Console.WriteLine("=== Awane メインループ終了 ===");
     }
     
-    // 静的ヘルパーメソッド
-    public static AwaneSystem CreateSystem()
-    {
-        return new AwaneSystem();
-    }
 }
 
 // Unity統合用の静的クラス
