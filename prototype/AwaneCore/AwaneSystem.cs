@@ -14,6 +14,8 @@ public partial class AwaneSystem
     private Task? _mainLoopTask;
     
     // シングルトンインスタンス（プロトタイプ用）
+    // TODO: 本実装ではDIコンテナで管理し、IAwaneSystemインターフェースを介してアクセスすべき
+    // Unity統合時は別途ファサードパターンで分離することを検討
     private static AwaneSystem? _instance;
     public static AwaneSystem Instance => _instance ??= new AwaneSystem();
     

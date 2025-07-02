@@ -10,6 +10,8 @@ public partial class AwaneSystem
     private NamedPipeServerStream? _pipeServer;
     private Task? _pipeServerTask;
     private CancellationTokenSource? _pipeServerCts;
+    // TODO: 本実装ではプロセス名も含めるべき（同一PIDの再利用対策）
+    // 例: $"Awane_{ProcessName}_{PID}_{Guid}"
     private readonly string _pipeName = $"Awane_{Process.GetCurrentProcess().Id}";
     
     // リモートアクセス用のパイプサーバーを開始

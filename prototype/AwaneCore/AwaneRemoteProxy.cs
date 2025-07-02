@@ -53,6 +53,8 @@ public class RemoteProxyInterceptor : IInterceptor
     
     private async Task<RemoteMethodResult> InvokeRemoteMethod(RemoteMethodCall call)
     {
+        // TODO: 本実装では接続タイムアウトを設定可能にすべき
+        // TODO: リトライ機構の実装（一時的な通信エラー対策）
         using var client = new NamedPipeClientStream(".", _pipeName, PipeDirection.InOut);
         await client.ConnectAsync(5000);
         
@@ -84,6 +86,8 @@ public class RemoteProxyInterceptor : IInterceptor
     private string SerializeArgument(object? arg)
     {
         if (arg == null) return "";
+        // TODO: 本実装ではMessagePackを使用（高速化、バイナリサイズ削減のため）
+        // Unity IL2CPPでの動作確認も必要
         return JsonSerializer.Serialize(arg, arg.GetType());
     }
     
@@ -127,6 +131,7 @@ public class RemoteMethodResult
 // プロキシファクトリ
 public static class AwaneProxyFactory
 {
+    // TODO: 本実装ではProxyGeneratorをDIで管理（シングルトンインスタンスの適切な管理）
     private static readonly ProxyGenerator _proxyGenerator = new();
     
     public static T CreateRemoteProxy<T>(string pipeName) where T : class

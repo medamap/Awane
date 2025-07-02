@@ -8,6 +8,8 @@ namespace AwaneCore;
 // プロセス間通信用のメッセージ
 public class AwaneMessage
 {
+    // TODO: 本実装ではenumにすべき（タイプセーフティ、IntelliSense補完、タイポ防止のため）
+    // 例: public MessageType MessageType { get; set; }
     public string MessageType { get; set; } = "";
     public string Payload { get; set; } = "";
 }
@@ -33,6 +35,7 @@ public class AwaneProcessInfo
 public class AwaneProcessDiscovery
 {
     private static readonly ConcurrentDictionary<string, AwaneProcessInfo> _registry = new();
+    // TODO: 本実装では設定ファイルやDIで注入すべき
     private static readonly string RegistryPipeName = "AwaneRegistry";
     private static CancellationTokenSource? _registryCts;
     private static Task? _registryTask;
@@ -99,6 +102,7 @@ public class AwaneProcessDiscovery
                 break;
                 
             case "List":
+                // TODO: 本実装ではハートビートタイムアウト値を設定可能にすべき
                 var activeProcesses = _registry.Values
                     .Where(p => (DateTime.UtcNow - p.LastHeartbeat).TotalSeconds < 30)
                     .ToList();
