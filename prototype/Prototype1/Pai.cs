@@ -77,6 +77,27 @@ public class Pai : IPai, IAsyncStartable, ITickable, IFixedTickable
             var output = await outputTask;
             var error = await errorTask;
             
+            // TODO: Claude CLIのエラーパターンと対処法
+            // 
+            // 1. ログインエラー
+            //    出力例: "Invalid API key"
+            //    出力例: "Please run /login"
+            //    出力例: "API Login Failure"
+            //    対処法: ユーザーに claude login の実行を促す
+            //
+            // 2. レートリミットエラー
+            //    出力例: "Claude AI usage limit reached|1750456800"
+            //    形式: "エラーメッセージ|UNIXエポック秒"
+            //    対処法: エポック秒まで待機するか、ユーザーに通知
+            //           待機時間 = エポック秒 - 現在時刻 + 余裕（1分程度）
+            //
+            // 3. Execute error%
+            //    出力例: "Execute error%"
+            //    対処法: claude --continue で継続実行を試みる
+            //
+            // 4. その他のエラー
+            //    対処法: エラーメッセージをそのまま返す
+            
             if (process.ExitCode != 0)
             {
                 Console.WriteLine($"[Pai] エラー発生: {error}");
