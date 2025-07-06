@@ -1,0 +1,107 @@
+{
+  "instruction_id": "001",
+  "title": "IAwaneComponentインターフェースの実装",
+  "objective": "C#とTypeScriptでIAwaneComponentインターフェースを定義し、TDDアプローチで基本的なテストを作成する",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "requirements": [
+    "TDDアプローチで実装（テストを先に書く）",
+    "名前衝突を避けるためAwaneプレフィクスを使用",
+    "C#とTypeScriptで同等の機能を提供",
+    "インターフェースメンバーはすべて読み取り専用"
+  ],
+  "specifications": {
+    "interface_definition": {
+      "name": "IAwaneComponent",
+      "members": {
+        "AwaneId": {
+          "type": "string",
+          "description": "コンポーネントの一意識別子",
+          "readonly": true
+        },
+        "AwaneLocation": {
+          "type": "string", 
+          "description": "コンポーネントの場所情報（例: 'process', 'local:1234', 'lan:192.168.1.10:5000'）",
+          "readonly": true
+        },
+        "AwaneInterfaces": {
+          "type": "string[]",
+          "description": "実装しているインターフェース名の配列（完全修飾名）",
+          "readonly": true
+        },
+        "AwaneName": {
+          "type": "string",
+          "description": "人間が読める名前",
+          "readonly": true
+        },
+        "AwaneVersion": {
+          "type": "string",
+          "description": "バージョン情報",
+          "readonly": true
+        },
+        "AwaneTags": {
+          "type": "Dictionary<string, string> (C#) / Record<string, string> (TS)",
+          "description": "検索用タグ",
+          "readonly": true
+        }
+      },
+      "methods": {
+        "AwaneAs<T>": {
+          "description": "指定された型へのキャスト",
+          "csharp_signature": "T AwaneAs<T>() where T : class",
+          "typescript_signature": "awaneAs<T>(): T"
+        }
+      }
+    },
+    "test_cases": [
+      {
+        "name": "MockComponentが全プロパティを正しく実装",
+        "description": "モックコンポーネントを作成し、各プロパティが正しく値を返すことを確認"
+      },
+      {
+        "name": "AwaneAsメソッドが正しく型変換",
+        "description": "AwaneAsメソッドが適切に型キャストできることを確認"
+      },
+      {
+        "name": "AwaneInterfacesに完全修飾名が含まれる",
+        "description": "インターフェース名が名前空間を含む完全修飾名であることを確認"
+      }
+    ],
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "シンプルなインターフェース定義のため、Red-Green-Refactorを一度に実行"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core/Awane.Core.csproj",
+    "src/csharp/Awane.Core/Components/IAwaneComponent.cs",
+    "src/csharp/Awane.Core.Tests/Awane.Core.Tests.csproj",
+    "src/csharp/Awane.Core.Tests/Components/IAwaneComponentTests.cs",
+    "src/nodejs/package.json",
+    "src/nodejs/tsconfig.json",
+    "src/nodejs/jest.config.js",
+    "src/nodejs/src/components/IAwaneComponent.ts",
+    "src/nodejs/test/components/IAwaneComponent.test.ts"
+  ],
+  "expected_test_results": {
+    "initial": "すべてのテストが失敗（Red）- コンパイルエラーまたは実装不足",
+    "final": "すべてのテストが成功（Green）"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md#iawanecomponentインターフェース",
+      "docs/development-guidelines.md#テスト駆動開発tddの採用"
+    ],
+    "secondary": [
+      "docs/implementation-instruction-framework.md"
+    ]
+  },
+  "report_path": "docs/reports/report-001-awane-component-interface.md",
+  "execution_notes": "1. 最初にプロジェクトファイル（.csproj, package.json）を作成\n2. テストファイルを作成し、失敗することを確認（Red）\n3. インターフェースを実装（Green）\n4. 必要に応じてリファクタリング\n5. 両言語でテストが通ることを確認\n6. レポートに実装内容とテスト結果を記載"
+}

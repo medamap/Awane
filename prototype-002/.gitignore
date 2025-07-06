@@ -1,0 +1,41 @@
+# ビルド成果物
+**/bin/
+**/obj/
+**/dist/
+**/build/
+*.dll
+*.exe
+*.pdb
+
+# 依存関係
+**/node_modules/
+**/packages/
+
+# IDE設定
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+
+# テスト成果物
+**/TestResults/
+**/.coverage/
+*.trx
+*.coverage
+
+# ログファイル
+*.log
+**/logs/
+
+# 一時ファイル
+*.tmp
+**/temp/
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+
+# Jest
+coverage/
