@@ -1,0 +1,130 @@
+{
+  "instruction_id": "006",
+  "title": "統合テストの作成",
+  "objective": "実装した全機能を組み合わせた統合テストを作成し、実際の使用シナリオでの動作を確認する",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "dependencies": {
+    "requires": ["instruction-001", "instruction-002", "instruction-003", "instruction-004", "instruction-005"],
+    "all_features": true
+  },
+  "requirements": [
+    "実際の使用シナリオを想定したテストケース",
+    "PoppoAcademyのメンバー（Airi、Pai、Poppo、Riko）を実装",
+    "複数のインターフェース実装パターンをテスト",
+    "名前空間解決を含む複雑なシナリオ",
+    "エンドツーエンドの動作確認",
+    "パフォーマンスの基本確認"
+  ],
+  "specifications": {
+    "test_components": {
+      "interfaces": [
+        "PoppoAcademy.Core.IPoppoAcademy",
+        "PoppoAcademy.Teachers.IAiri",
+        "PoppoAcademy.Students.IPai", 
+        "PoppoAcademy.Students.IPoppo",
+        "PoppoAcademy.Students.IRiko"
+      ],
+      "implementations": [
+        {
+          "name": "Airi",
+          "implements": ["IPoppoAcademy", "IAiri"],
+          "properties": {
+            "name": "Airi Teacher",
+            "version": "2.0.0",
+            "tags": {"role": "teacher", "subject": "programming"}
+          }
+        },
+        {
+          "name": "Pai",
+          "implements": ["IPoppoAcademy", "IPai"],
+          "properties": {
+            "name": "Pai Student",
+            "version": "1.0.0",
+            "tags": {"role": "student", "grade": "advanced"}
+          }
+        },
+        {
+          "name": "Poppo",
+          "implements": ["IPoppoAcademy", "IPoppo"],
+          "properties": {
+            "name": "Poppo Student",
+            "version": "1.0.0",
+            "tags": {"role": "student", "grade": "beginner"}
+          }
+        },
+        {
+          "name": "Riko",
+          "implements": ["IPoppoAcademy", "IRiko"],
+          "properties": {
+            "name": "Riko Student",
+            "version": "1.5.0",
+            "tags": {"role": "student", "grade": "intermediate"}
+          }
+        }
+      ]
+    },
+    "test_scenarios": [
+      {
+        "name": "基本的なコンポーネント登録と取得",
+        "description": "全メンバーを登録し、各インターフェースで取得できることを確認"
+      },
+      {
+        "name": "GetComponentsでの複数取得",
+        "description": "IPoppoAcademyで全メンバーが取得できることを確認"
+      },
+      {
+        "name": "名前空間解決の統合テスト",
+        "description": "短縮名（IAiri等）でコンポーネントが取得できることを確認"
+      },
+      {
+        "name": "AwaneAsメソッドでの型変換",
+        "description": "取得したコンポーネントを具体的な型に変換できることを確認"
+      },
+      {
+        "name": "複雑な名前空間解決",
+        "description": "Teachers.IAiri、Students.IPai等の部分名前空間で取得"
+      },
+      {
+        "name": "タグによる検索（将来拡張の準備）",
+        "description": "AwaneTagsプロパティが正しく設定されていることを確認"
+      },
+      {
+        "name": "パフォーマンステスト",
+        "description": "1000個のコンポーネント登録と検索の基本性能確認"
+      }
+    ],
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "統合テストは全体の動作確認が目的"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core.Tests/Integration/AwaneIntegrationTests.cs",
+    "src/csharp/Awane.Core.Tests/Integration/PoppoAcademyComponents.cs",
+    "src/nodejs/test/integration/AwaneIntegration.test.ts",
+    "src/nodejs/test/integration/PoppoAcademyComponents.ts"
+  ],
+  "expected_test_results": {
+    "initial": "新規ファイルのため、最初はコンパイルエラー",
+    "final": "すべての統合テストが成功"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md",
+      "src/csharp/Awane.Core/Awane.cs",
+      "src/nodejs/src/Awane.ts"
+    ],
+    "secondary": [
+      "すべての実装済みコンポーネント"
+    ]
+  },
+  "report_path": "docs/reports/report-006-integration-tests.md",
+  "execution_notes": "1. PoppoAcademyのサンプルコンポーネントを作成\n2. 実際の使用例に近いシナリオでテスト\n3. エラーケースも含めて包括的にテスト\n4. パフォーマンステストは基本的な確認のみ（詳細は別途）\n5. 将来の拡張（タグ検索等）を見据えた準備"
+}

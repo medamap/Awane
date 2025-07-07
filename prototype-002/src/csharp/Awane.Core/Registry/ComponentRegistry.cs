@@ -16,6 +16,30 @@ namespace Awane.Core.Registry
             registry = new ConcurrentDictionary<string, List<IAwaneComponent>>();
         }
 
+        public void RegisterComponent(string interfaceName, IAwaneComponent component)
+        {
+            if (string.IsNullOrEmpty(interfaceName))
+            {
+                throw new ArgumentNullException(nameof(interfaceName));
+            }
+
+            if (component == null)
+            {
+                throw new ArgumentNullException(nameof(component));
+            }
+
+            registry.AddOrUpdate(interfaceName,
+                new List<IAwaneComponent> { component },
+                (key, existingList) =>
+                {
+                    lock (lockObject)
+                    {
+                        var newList = new List<IAwaneComponent>(existingList) { component };
+                        return newList;
+                    }
+                });
+        }
+
         public void Register(IAwaneComponent component)
         {
             if (component == null)
@@ -45,6 +69,30 @@ namespace Awane.Core.Registry
             }
         }
 
+        public T? GetComponent<T>(string interfaceName) where T : class
+        {
+            if (string.IsNullOrEmpty(interfaceName))
+            {
+                return null;
+            }
+
+            var resolvedName = ResolveInterfaceName(interfaceName);
+            if (resolvedName == null)
+            {
+                return null;
+            }
+
+            if (registry.TryGetValue(resolvedName, out var components))
+            {
+                lock (lockObject)
+                {
+                    return components.FirstOrDefault() as T;
+                }
+            }
+
+            return null;
+        }
+
         public IAwaneComponent? GetComponent(string interfaceName)
         {
             if (string.IsNullOrEmpty(interfaceName))
@@ -52,33 +100,36 @@ namespace Awane.Core.Registry
                 return null;
             }
 
-            if (registry.TryGetValue(interfaceName, out var components))
+            return GetComponent<IAwaneComponent>(interfaceName);
+        }
+
+        public IEnumerable<T> GetComponents<T>(string interfaceName) where T : class
+        {
+            if (string.IsNullOrEmpty(interfaceName))
             {
-                lock (lockObject)
+                return Enumerable.Empty<T>();
+            }
+
+            var matches = FindMatchingInterfaces(interfaceName);
+            var result = new List<T>();
+
+            foreach (var match in matches)
+            {
+                if (registry.TryGetValue(match, out var components))
                 {
-                    return components.FirstOrDefault();
+                    lock (lockObject)
+                    {
+                        result.AddRange(components.OfType<T>());
+                    }
                 }
             }
 
-            return null;
+            return result;
         }
 
         public IAwaneComponent[] GetComponents(string interfaceName)
         {
-            if (string.IsNullOrEmpty(interfaceName))
-            {
-                return Array.Empty<IAwaneComponent>();
-            }
-
-            if (registry.TryGetValue(interfaceName, out var components))
-            {
-                lock (lockObject)
-                {
-                    return components.ToArray();
-                }
-            }
-
-            return Array.Empty<IAwaneComponent>();
+            return GetComponents<IAwaneComponent>(interfaceName).ToArray();
         }
 
         public void Clear()
@@ -89,6 +140,64 @@ namespace Awane.Core.Registry
         public string[] GetRegisteredInterfaces()
         {
             return registry.Keys.OrderBy(k => k).ToArray();
+        }
+
+        private string? ResolveInterfaceName(string requestedName)
+        {
+            if (registry.ContainsKey(requestedName))
+            {
+                return requestedName;
+            }
+
+            var matches = FindMatchingInterfaces(requestedName);
+            
+            if (matches.Count == 0)
+            {
+                return null;
+            }
+
+            if (matches.Count == 1)
+            {
+                return matches[0];
+            }
+
+            throw new AmbiguousComponentException(requestedName, matches);
+        }
+
+        private List<string> FindMatchingInterfaces(string requestedName)
+        {
+            var matches = new List<string>();
+            
+            foreach (var registeredInterface in registry.Keys)
+            {
+                if (IsMatch(registeredInterface, requestedName))
+                {
+                    matches.Add(registeredInterface);
+                }
+            }
+
+            return matches;
+        }
+
+        private bool IsMatch(string fullName, string suffix)
+        {
+            if (fullName == suffix)
+            {
+                return true;
+            }
+
+            if (fullName.EndsWith("." + suffix))
+            {
+                return true;
+            }
+
+            // Support partial namespace matching like "Students."
+            if (suffix.EndsWith(".") && fullName.Contains(suffix))
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }

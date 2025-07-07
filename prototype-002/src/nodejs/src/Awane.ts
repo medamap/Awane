@@ -1,5 +1,6 @@
 import { IAwaneComponent } from './components/IAwaneComponent';
 import { ComponentRegistry } from './registry/ComponentRegistry';
+import { ComponentAlreadyRegisteredException } from './registry/ComponentAlreadyRegisteredException';
 
 // Internal registry instance
 const registry = new ComponentRegistry();
@@ -13,7 +14,20 @@ export function register(component: IAwaneComponent): void {
     if (!component) {
         throw new Error('Component cannot be null or undefined');
     }
-    registry.register(component);
+    
+    // Check if component is already registered
+    const existingComponent = registry.getComponent(component.awaneId);
+    if (existingComponent !== null) {
+        throw new ComponentAlreadyRegisteredException(`Component with ID '${component.awaneId}' is already registered.`);
+    }
+    
+    // Register by component ID
+    registry.registerComponent(component.awaneId, component);
+    
+    // Register for each interface in awaneInterfaces
+    component.awaneInterfaces.forEach(interfaceName => {
+        registry.registerComponent(interfaceName, component);
+    });
 }
 
 /**

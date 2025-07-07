@@ -1,0 +1,130 @@
+{
+  "instruction_id": "005",
+  "title": "段階的名前空間解決ロジックの実装",
+  "objective": "完全修飾名でない場合でも、最小限の指定でコンポーネントを一意に特定できる名前空間解決ロジックを実装する",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "dependencies": {
+    "requires": ["instruction-001", "instruction-002", "instruction-003", "instruction-004"],
+    "classes": ["ComponentRegistry", "Awane"]
+  },
+  "requirements": [
+    "TDDアプローチで実装（テストを先に書く）",
+    "右端から段階的に名前解決を試みる",
+    "一意に特定できる最小限の指定を受け入れる",
+    "曖昧な場合は適切なエラーメッセージを返す",
+    "既存のGetComponent/GetComponentsメソッドを拡張",
+    "後方互換性を保つ（完全修飾名も引き続き動作）"
+  ],
+  "specifications": {
+    "resolution_algorithm": {
+      "description": "段階的名前解決アルゴリズム",
+      "steps": [
+        "入力されたインターフェース名を'.'で分割",
+        "右端から順に部分文字列を作成",
+        "各部分文字列で登録済みインターフェースを検索",
+        "一意に特定できたら返却",
+        "複数マッチした場合は曖昧エラー"
+      ],
+      "examples": [
+        {
+          "registered": ["Tanaka.Cat.IAiri", "Tanaka.Dog.IAiri", "Hirano.Cat.IAiri"],
+          "input": "IAiri",
+          "result": "エラー: 3つとも該当"
+        },
+        {
+          "registered": ["Tanaka.Cat.IAiri", "Tanaka.Dog.IAiri", "Hirano.Cat.IAiri"],
+          "input": "Cat.IAiri",
+          "result": "エラー: Tanaka.Cat.IAiri と Hirano.Cat.IAiri"
+        },
+        {
+          "registered": ["Tanaka.Cat.IAiri", "Tanaka.Dog.IAiri", "Hirano.Cat.IAiri"],
+          "input": "Dog.IAiri",
+          "result": "成功: Tanaka.Dog.IAiri"
+        }
+      ]
+    },
+    "implementation_approach": {
+      "csharp": {
+        "location": "ComponentRegistryクラスに解決ロジックを追加",
+        "methods": [
+          "private string? ResolveInterfaceName(string requestedName)",
+          "private bool IsMatch(string fullName, string suffix)"
+        ]
+      },
+      "typescript": {
+        "location": "ComponentRegistryクラスに解決ロジックを追加",
+        "methods": [
+          "private resolveInterfaceName(requestedName: string): string | null",
+          "private isMatch(fullName: string, suffix: string): boolean"
+        ]
+      }
+    },
+    "error_handling": {
+      "ambiguous_match": {
+        "csharp": "AmbiguousComponentException",
+        "typescript": "Error with descriptive message"
+      },
+      "error_message_format": "Ambiguous interface name '{0}'. Multiple matches found: {1}. Use a more specific name."
+    },
+    "test_cases": [
+      {
+        "name": "完全修飾名での取得",
+        "description": "完全修飾名は引き続き正常に動作することを確認"
+      },
+      {
+        "name": "最短名での一意な取得",
+        "description": "インターフェース名だけで一意に特定できる場合"
+      },
+      {
+        "name": "部分的な名前空間での取得",
+        "description": "Cat.IAiriのような部分指定で取得"
+      },
+      {
+        "name": "曖昧な名前でのエラー",
+        "description": "複数マッチする場合の適切なエラーメッセージ"
+      },
+      {
+        "name": "存在しない名前",
+        "description": "どのパターンにもマッチしない場合はnull"
+      },
+      {
+        "name": "大文字小文字の区別",
+        "description": "名前空間解決での大文字小文字の扱い"
+      }
+    ],
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "アルゴリズムは複雑だが、単一機能として実装可能"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core/Registry/ComponentRegistry.cs（更新）",
+    "src/csharp/Awane.Core/Registry/AmbiguousComponentException.cs（新規）",
+    "src/csharp/Awane.Core.Tests/Registry/NamespaceResolutionTests.cs（新規）",
+    "src/nodejs/src/registry/ComponentRegistry.ts（更新）",
+    "src/nodejs/test/registry/NamespaceResolution.test.ts（新規）"
+  ],
+  "expected_test_results": {
+    "initial": "新しいテストが失敗（解決ロジック未実装）",
+    "final": "すべてのテストが成功（既存テストも含む）"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md#名前空間解決",
+      "src/csharp/Awane.Core/Registry/ComponentRegistry.cs",
+      "src/nodejs/src/registry/ComponentRegistry.ts"
+    ],
+    "secondary": [
+      "docs/development-guidelines.md"
+    ]
+  },
+  "report_path": "docs/reports/report-005-namespace-resolution.md",
+  "execution_notes": "1. 既存のGetComponentメソッドを変更（解決ロジックを追加）\n2. 後方互換性を保つ（完全修飾名は優先的にマッチ）\n3. パフォーマンスを考慮（キャッシュは今回は不要）\n4. エラーメッセージに候補を含める"
+}
