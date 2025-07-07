@@ -1,0 +1,129 @@
+{
+  "instruction_id": "003",
+  "title": "ComponentRegistry基本実装",
+  "objective": "プロセス内でコンポーネントを登録・検索するためのComponentRegistryクラスを実装する",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "dependencies": {
+    "requires": ["instruction-001", "instruction-002"],
+    "interfaces": ["IAwaneComponent"],
+    "classes": ["AwaneComponent"]
+  },
+  "requirements": [
+    "TDDアプローチで実装（テストを先に書く）",
+    "コンポーネントをインターフェース名で登録・検索",
+    "複数のインターフェースを実装するコンポーネントは各インターフェース名で登録",
+    "同じインターフェースを実装する複数のコンポーネントを保持可能",
+    "スレッドセーフな実装（C#）",
+    "シンプルな内部データ構造（辞書/Map）"
+  ],
+  "specifications": {
+    "class_definition": {
+      "name": "ComponentRegistry",
+      "namespace": {
+        "csharp": "Awane.Core.Registry",
+        "typescript": "registry"
+      },
+      "internal_structure": {
+        "csharp": "Dictionary<string, List<IAwaneComponent>>",
+        "typescript": "Map<string, IAwaneComponent[]>"
+      },
+      "methods": {
+        "Register": {
+          "description": "コンポーネントを登録（全インターフェースに対して）",
+          "signature": {
+            "csharp": "void Register(IAwaneComponent component)",
+            "typescript": "register(component: IAwaneComponent): void"
+          }
+        },
+        "GetComponent": {
+          "description": "指定インターフェースを実装する最初のコンポーネントを取得",
+          "signature": {
+            "csharp": "IAwaneComponent? GetComponent(string interfaceName)",
+            "typescript": "getComponent(interfaceName: string): IAwaneComponent | null"
+          }
+        },
+        "GetComponents": {
+          "description": "指定インターフェースを実装するすべてのコンポーネントを取得",
+          "signature": {
+            "csharp": "IAwaneComponent[] GetComponents(string interfaceName)",
+            "typescript": "getComponents(interfaceName: string): IAwaneComponent[]"
+          }
+        },
+        "Clear": {
+          "description": "すべての登録をクリア（テスト用）",
+          "signature": {
+            "csharp": "void Clear()",
+            "typescript": "clear(): void"
+          }
+        },
+        "GetRegisteredInterfaces": {
+          "description": "登録されているインターフェース名一覧を取得（デバッグ用）",
+          "signature": {
+            "csharp": "string[] GetRegisteredInterfaces()",
+            "typescript": "getRegisteredInterfaces(): string[]"
+          }
+        }
+      }
+    },
+    "test_cases": [
+      {
+        "name": "空のレジストリからの取得",
+        "description": "何も登録されていない状態でGetComponentがnullを返すことを確認"
+      },
+      {
+        "name": "単一コンポーネントの登録と取得",
+        "description": "1つのコンポーネントを登録し、そのインターフェースで取得できることを確認"
+      },
+      {
+        "name": "複数インターフェースの登録",
+        "description": "複数のインターフェースを実装するコンポーネントが各インターフェース名で取得できることを確認"
+      },
+      {
+        "name": "同一インターフェースの複数コンポーネント",
+        "description": "同じインターフェースを実装する複数のコンポーネントが登録・取得できることを確認"
+      },
+      {
+        "name": "GetComponentsの動作",
+        "description": "複数コンポーネントが登録されている場合、GetComponentsが全て返すことを確認"
+      },
+      {
+        "name": "Clearメソッドの動作",
+        "description": "Clear後にコンポーネントが取得できないことを確認"
+      }
+    ],
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "基本的なレジストリ機能のため、Red-Green-Refactorを一度に実行"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core/Registry/ComponentRegistry.cs",
+    "src/csharp/Awane.Core.Tests/Registry/ComponentRegistryTests.cs",
+    "src/nodejs/src/registry/ComponentRegistry.ts",
+    "src/nodejs/test/registry/ComponentRegistry.test.ts"
+  ],
+  "expected_test_results": {
+    "initial": "テストが失敗（クラスが存在しない）",
+    "final": "すべてのテストが成功"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md#コンポーネント登録",
+      "docs/registry-architecture.md",
+      "src/csharp/Awane.Core/Components/IAwaneComponent.cs",
+      "src/csharp/Awane.Core/Components/AwaneComponent.cs"
+    ],
+    "secondary": [
+      "docs/development-guidelines.md"
+    ]
+  },
+  "report_path": "docs/reports/report-003-component-registry-basic.md",
+  "execution_notes": "1. テストでモックコンポーネントを作成（AwaneComponentを継承）\n2. C#ではConcurrentDictionaryの使用を検討（スレッドセーフ）\n3. 空配列を返す場合は新しい配列インスタンスを返す\n4. インターフェース名は完全修飾名を想定"
+}

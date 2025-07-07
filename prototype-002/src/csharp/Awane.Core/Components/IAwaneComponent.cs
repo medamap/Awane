@@ -16,6 +16,6 @@ namespace Awane.Core.Components
         
         Dictionary<string, string> AwaneTags { get; }
         
-        T AwaneAs<T>() where T : class;
+        T? AwaneAs<T>() where T : class;
     }
 }

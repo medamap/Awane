@@ -1,0 +1,145 @@
+{
+  "instruction_id": "004",
+  "title": "Awaneスタティックエントリーポイント実装",
+  "objective": "ComponentRegistryを使用してAwane.Register()とAwane.GetComponent()のスタティックAPIを実装する",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "dependencies": {
+    "requires": ["instruction-001", "instruction-002", "instruction-003"],
+    "interfaces": ["IAwaneComponent"],
+    "classes": ["AwaneComponent", "ComponentRegistry"]
+  },
+  "requirements": [
+    "TDDアプローチで実装（テストを先に書く）",
+    "Awaneクラスをスタティック（C#）/シングルトン（TS）として実装",
+    "内部でComponentRegistryのインスタンスを保持",
+    "Register/GetComponent/GetComponentsメソッドを提供",
+    "TypeScriptではexportされた関数として実装も検討",
+    "テスト間で状態が共有されないようReset/Clear機能を提供"
+  ],
+  "specifications": {
+    "class_definition": {
+      "name": "Awane",
+      "namespace": {
+        "csharp": "Awane.Core",
+        "typescript": "awane"
+      },
+      "design_pattern": {
+        "csharp": "Static class with static methods",
+        "typescript": "Singleton pattern or exported functions"
+      },
+      "methods": {
+        "Register": {
+          "description": "コンポーネントを登録",
+          "signature": {
+            "csharp": "public static void Register(IAwaneComponent component)",
+            "typescript": "export function register(component: IAwaneComponent): void"
+          }
+        },
+        "GetComponent<T>": {
+          "description": "ジェネリック型でコンポーネントを取得",
+          "signature": {
+            "csharp": "public static T? GetComponent<T>() where T : class",
+            "typescript": "export function getComponent<T>(interfaceName: string): T | null"
+          }
+        },
+        "GetComponent(string)": {
+          "description": "インターフェース名でコンポーネントを取得",
+          "signature": {
+            "csharp": "public static IAwaneComponent? GetComponent(string interfaceName)",
+            "typescript": "// 上記と同じ"
+          }
+        },
+        "GetComponents<T>": {
+          "description": "ジェネリック型で複数コンポーネントを取得",
+          "signature": {
+            "csharp": "public static T[] GetComponents<T>() where T : class",
+            "typescript": "export function getComponents<T>(interfaceName: string): T[]"
+          }
+        },
+        "GetComponents(string)": {
+          "description": "インターフェース名で複数コンポーネントを取得",
+          "signature": {
+            "csharp": "public static IAwaneComponent[] GetComponents(string interfaceName)",
+            "typescript": "// 上記と同じ"
+          }
+        },
+        "Reset": {
+          "description": "レジストリをクリア（テスト用）",
+          "signature": {
+            "csharp": "public static void Reset()",
+            "typescript": "export function reset(): void"
+          }
+        }
+      }
+    },
+    "implementation_details": {
+      "csharp": {
+        "type_extraction": "typeof(T).FullNameでインターフェース名を取得",
+        "casting": "GetComponentの結果をT型にキャスト"
+      },
+      "typescript": {
+        "type_info": "実行時に型情報がないため、文字列でインターフェース名を指定",
+        "casting": "型アサーションで返却"
+      }
+    },
+    "test_cases": [
+      {
+        "name": "基本的な登録と取得",
+        "description": "Registerで登録したコンポーネントがGetComponentで取得できることを確認"
+      },
+      {
+        "name": "ジェネリック型での取得（C#）",
+        "description": "GetComponent<T>()で型安全に取得できることを確認"
+      },
+      {
+        "name": "複数コンポーネントの取得",
+        "description": "GetComponentsで複数のコンポーネントが取得できることを確認"
+      },
+      {
+        "name": "Resetの動作",
+        "description": "Reset後にコンポーネントが取得できないことを確認"
+      },
+      {
+        "name": "nullコンポーネントの登録エラー",
+        "description": "nullを登録しようとするとエラーになることを確認"
+      },
+      {
+        "name": "存在しないインターフェースの取得",
+        "description": "登録されていないインターフェースでnullが返ることを確認"
+      }
+    ],
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "スタティックAPIラッパーのため比較的シンプル"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core/Awane.cs",
+    "src/csharp/Awane.Core.Tests/AwaneTests.cs",
+    "src/nodejs/src/Awane.ts",
+    "src/nodejs/test/Awane.test.ts"
+  ],
+  "expected_test_results": {
+    "initial": "テストが失敗（クラス/関数が存在しない）",
+    "final": "すべてのテストが成功"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md#コンポーネント登録",
+      "src/csharp/Awane.Core/Registry/ComponentRegistry.cs",
+      "src/nodejs/src/registry/ComponentRegistry.ts"
+    ],
+    "secondary": [
+      "docs/development-guidelines.md"
+    ]
+  },
+  "report_path": "docs/reports/report-004-awane-static-api.md",
+  "execution_notes": "1. テストでは各テストケースの前にResetを呼ぶ\n2. C#のジェネリックメソッドとTypeScriptの文字列指定の違いに注意\n3. TypeScriptではawane.register()のような関数スタイルも検討\n4. 内部のComponentRegistryインスタンスは隠蔽する"
+}

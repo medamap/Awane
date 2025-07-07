@@ -1,0 +1,102 @@
+{
+  "instruction_id": "002",
+  "title": "AwaneComponent基底クラスの実装",
+  "objective": "IAwaneComponentインターフェースを実装する抽象基底クラスを作成し、継承による簡単な実装を可能にする",
+  "context": {
+    "project_root": "/Volumes/PoppoSSD2T/Projects/ClaudeCodeProjects/PoppoAcademy/Awane/prototype-002",
+    "target_languages": ["csharp", "typescript"],
+    "test_frameworks": {
+      "csharp": "MSTest",
+      "typescript": "Jest"
+    }
+  },
+  "dependencies": {
+    "requires": ["instruction-001"],
+    "interfaces": ["IAwaneComponent"]
+  },
+  "requirements": [
+    "TDDアプローチで実装（テストを先に書く）",
+    "IAwaneComponentインターフェースを実装する抽象基底クラス",
+    "コンストラクタでAwaneIdを自動生成（GUID/UUID）",
+    "AwaneLocationのデフォルト値は\"process\"",
+    "C#ではリフレクションでインターフェースを自動取得",
+    "TypeScriptではaddInterfaceメソッドで手動登録",
+    "System名前空間のインターフェースは除外（C#）"
+  ],
+  "specifications": {
+    "class_definition": {
+      "name": "AwaneComponent",
+      "type": "abstract class",
+      "csharp_implementation": {
+        "constructor": "自動的にAwaneId生成、インターフェースをリフレクションで取得",
+        "methods": {
+          "IsSystemInterface": "System名前空間のインターフェースを判定",
+          "AwaneAs<T>": "this as T でキャスト"
+        }
+      },
+      "typescript_implementation": {
+        "constructor": "自動的にawaneId生成、awaneInterfaces配列を初期化",
+        "methods": {
+          "addInterface": "インターフェース名を手動で追加",
+          "awaneAs<T>": "this as unknown as T でキャスト"
+        }
+      }
+    },
+    "test_cases": [
+      {
+        "name": "AwaneIdの自動生成と一意性",
+        "description": "複数インスタンスのAwaneIdが異なることを確認"
+      },
+      {
+        "name": "デフォルト値の確認",
+        "description": "AwaneLocationが\"process\"であることを確認"
+      },
+      {
+        "name": "C#: インターフェースの自動取得",
+        "description": "継承クラスのインターフェースが自動的にAwaneInterfacesに含まれることを確認"
+      },
+      {
+        "name": "C#: System名前空間の除外",
+        "description": "IDisposableなどのSystem名前空間のインターフェースが除外されることを確認"
+      },
+      {
+        "name": "TypeScript: addInterfaceメソッド",
+        "description": "addInterfaceで追加したインターフェース名がawaneInterfacesに含まれることを確認"
+      },
+      {
+        "name": "AwaneAsメソッドの動作",
+        "description": "派生クラスが正しくキャストできることを確認"
+      }
+    ],
+    "sample_implementations": {
+      "csharp": "TestComponent : AwaneComponent, ITestInterface",
+      "typescript": "TestComponent extends AwaneComponent implements ITestInterface"
+    },
+    "implementation_scope": {
+      "type": "full-cycle",
+      "reason": "基底クラスの実装は比較的シンプルなため"
+    }
+  },
+  "deliverables": [
+    "src/csharp/Awane.Core/Components/AwaneComponent.cs",
+    "src/csharp/Awane.Core.Tests/Components/AwaneComponentTests.cs",
+    "src/nodejs/src/components/AwaneComponent.ts",
+    "src/nodejs/test/components/AwaneComponent.test.ts"
+  ],
+  "expected_test_results": {
+    "initial": "テストが失敗（クラスが存在しない）",
+    "final": "すべてのテストが成功"
+  },
+  "references": {
+    "primary": [
+      "docs/api-design.md#継承階層による実装",
+      "src/csharp/Awane.Core/Components/IAwaneComponent.cs",
+      "src/nodejs/src/components/IAwaneComponent.ts"
+    ],
+    "secondary": [
+      "docs/development-guidelines.md"
+    ]
+  },
+  "report_path": "docs/reports/report-002-awane-component-base-class.md",
+  "execution_notes": "1. 既存のIAwaneComponentインターフェースを参照\n2. テストファイルを作成（派生クラスを含む）\n3. 基底クラスを実装\n4. C#とTypeScriptで異なるアプローチに注意（リフレクション vs 手動登録）\n5. 両言語でテストが通ることを確認"
+}
